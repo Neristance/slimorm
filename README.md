@@ -1,5 +1,8 @@
 # TinyOrm
-TinyOrm is a small annotation based library that generates converters form cursor to pojos.
+TinyOrm is a small annotation based library that generates converters form ```Cursor``` to ```POJOs``` as well as ```POJOs``` to ```ContentValues```.
+A lot of people still using the old fashioned SqliteDatabase which comes with the Android Framework but can't easily switch to libaries like 
+[Room](https://developer.android.com/topic/libraries/architecture/room.html), [Realm](https://realm.io/), [GreenDao](http://greenrobot.org/greendao/), [ObjectBox](http://objectbox.io/) etc.
+That is where this tiny library should help to at least reduce the boilerplate code you have to write when using ```Cursor``` and make your code more readable.
 
 ## What it does
 
@@ -50,10 +53,29 @@ public final class PojoConverter {
      }
      return list;
    }
+   
+   public static ContentValues toContentValues(Pojo pojo) {
+       final ContentValues contentValues = new ContentValues();
+       contentValues.put("_id", pojo.id);
+       contentValues.put("timeStamp", pojo.anInt);
+       contentValues.put("value", pojo.niceValue);
+       contentValues.put("boolValue", pojo.aBoolean);
+       contentValues.put("boolValue", pojo.niceBoolean);
+       contentValues.put("doubleValue", pojo.aDouble);
+       contentValues.put("doubleValue", pojo.niceDouble);
+       contentValues.put("longValue", pojo.aLong);
+       contentValues.put("longValue", pojo.niceLong);
+       contentValues.put("floatValue", pojo.aFloat);
+       contentValues.put("floatValue", pojo.niceFloat);
+       contentValues.put("shortValue", pojo.aShort);
+       contentValues.put("shortValue", pojo.niceShort);
+       contentValues.put("byteArrayValue", pojo.byteArray);
+       return contentValues;
+     }
  }
  ```
  
- As you can see it generates the Boilerplate code to convert the cursor to the fields in the Pojo and thats pretty easy just add the @Field annotation and you are done:
+ As you can see it generates the Boilerplate code to convert the ```Cursor``` to the fields in the ```POJO``` as well as back to ```ContentValues``` and that's pretty easy just add the ```@Field(columnName = "dbcolumn")``` annotation and you are done:
  
  ```java
  public class Pojo {
@@ -118,9 +140,11 @@ public final class PojoConverter {
  
  ## Usage
  
- * Create your Pojo, the fields need to be protected or package private
+ * Create your POJO, the fields need to be protected or package private
+    * Since it is generating code the generated code needs access to the fields
  * Add the @Field annotation to the fields that should be filled and specify the column name
- * Simply call ```PojoConverter.toSingleRow(cursor)``` or ```PojoConverter.toList(cursor)```
+ * Simply call ```PojoConverter.toSingleRow(cursor)``` or ```PojoConverter.toList(cursor)``` to convert your ```Cursor``` to ```POJO```
+ * It also supports the way from Pojo to ```ContentValues``` simple call ```PojoConverter.toContentValues(pojo)```
  
  **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integer``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**
 
@@ -131,8 +155,8 @@ In order to make TinyOrm work in your project you need to add the TinyOrm depend
 ``` groovy
 
 dependencies {
-    implementation project('dominikschulz.io:tinyorm-annotations:0.1')
-    annotationProcessor project('dominikschulz.io:tinyorm-processor:0.1')
+    implementation project('dominikschulz.io:tinyorm-annotations:0.2')
+    annotationProcessor project('dominikschulz.io:tinyorm-processor:0.2')
 }
 
 ```
