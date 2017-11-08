@@ -132,6 +132,9 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 .addStatement("     list.add(toSingleRow(cursor))")
                 .addCode("}\n")
                 .addStatement("return list")
+                .addJavadoc("Converts the {@code cursor} to {@code $T}, \nmake sure the cursor is in the correct initial position", listOfPojo)
+                .addJavadoc("\n@param cursor to convert values from")
+                .addJavadoc("\n@returns {@code $T} with values converted from {@code cursor}", listOfPojo)
                 .build();
     }
 
@@ -155,6 +158,9 @@ public class TinyOrmProcessor extends AbstractProcessor {
         }
 
         methodBuilder.addStatement("return row");
+        methodBuilder.addJavadoc("Converts the {@code cursor} in its current position to an $T, \nmake sure the cursor is in the correct position", typeElement);
+        methodBuilder.addJavadoc("\n@param cursor to convert values from");
+        methodBuilder.addJavadoc("\n@returns $T with values converted from {@code cursor}", typeElement);
 
         return methodBuilder.build();
     }

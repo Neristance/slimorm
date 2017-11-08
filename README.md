@@ -120,6 +120,7 @@ public final class PojoConverter {
  
  * Create your Pojo, the fields need to be protected or package private
  * Add the @Field annotation to the fields that should be filled and specify the column name
+ * Simply call ```PojoConverter.toSingleRow(cursor)``` or ```PojoConverter.toList(cursor)```
  
  **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integr``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**
 
