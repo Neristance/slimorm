@@ -99,11 +99,11 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 classBuilder(typeElement.getSimpleName() + "Converter")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
-        final MethodSpec singleRowParseMethod = generateSingleRowParseMethod(typeElement, listOfVariables, classBuilder);
-        classBuilder.addMethod(singleRowParseMethod);
+        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables));
 
-        final MethodSpec listParseMethod = generateListParseMethod(pojoType);
-        classBuilder.addMethod(listParseMethod);
+        classBuilder.addMethod(generateListParseMethod(pojoType));
+
+        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables));
 
         try {
             JavaFile.builder(pojoType.packageName(), classBuilder.build())
@@ -113,6 +113,29 @@ public class TinyOrmProcessor extends AbstractProcessor {
             e.printStackTrace();
         }
 
+    }
+
+    private MethodSpec generateToContentValuesMethod(TypeElement typeElement, List<VariableElement> listOfVariables) {
+        final String parameterName = typeElement.getSimpleName().toString().toLowerCase();
+        final ClassName contentValuesClassName = ClassName.get("android.content", "ContentValues");
+
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("toContentValues")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(contentValuesClassName)
+                .addParameter(ClassName.get(typeElement), parameterName)
+                .addStatement("$T contentValues = new $T()", contentValuesClassName, contentValuesClassName);
+
+        for (VariableElement variableElement : listOfVariables) {
+            Field field = variableElement.getAnnotation(Field.class);
+            methodBuilder.addStatement("contentValues.put($S, $L)", field.columnName(), parameterName + "." + variableElement.getSimpleName());
+        }
+
+        methodBuilder.addStatement("return contentValues");
+        methodBuilder.addJavadoc("Converts the provided " + parameterName + " to ContentValues");
+        methodBuilder.addJavadoc("\n@param " + parameterName + " to convert values from");
+        methodBuilder.addJavadoc("\n@returns {@code $T} with values converted from {@code $T}", contentValuesClassName, typeElement);
+
+        return methodBuilder.build();
     }
 
     private MethodSpec generateListParseMethod(ClassName pojoType) {
@@ -134,7 +157,7 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 .build();
     }
 
-    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, List<VariableElement> listOfVariables, TypeSpec.Builder classBuilder) {
+    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, List<VariableElement> listOfVariables) {
         final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("toSingleRow")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(ClassName.get(typeElement))
