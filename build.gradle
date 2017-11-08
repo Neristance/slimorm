@@ -20,6 +20,16 @@ allprojects {
         google()
         jcenter()
     }
+
+    ext {
+        VERSION = '0.1'
+        GROUP_ID = 'dominikschulz.io'
+        REPO = 'TinyOrm'
+
+        BINTRAY_USER = System.properties.getProperty("bintray.user")
+        BINTRAY_API_KEY = System.properties.getProperty("bintray.key")
+        GITHUB_REPO = 'Neristance/tinyorm'
+    }
 }
 
 task clean(type: Delete) {

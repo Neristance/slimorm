@@ -1,4 +1,4 @@
-package dominikschulz.io.tiny_orm_processor;
+package dominikschulz.io.processor.tinyorm;
 
 
 import com.squareup.javapoet.ArrayTypeName;
@@ -59,8 +59,6 @@ public class TinyOrmProcessor extends AbstractProcessor {
 
         for (Element element : roundEnv.getElementsAnnotatedWith(Field.class)) {
 
-            log("Found annotation " + element.getKind());
-
             if (element.getKind() == ElementKind.FIELD) {
 
                 if (element.getModifiers().contains(Modifier.PRIVATE)) {
@@ -81,8 +79,6 @@ public class TinyOrmProcessor extends AbstractProcessor {
 
             }
         }
-
-        log("Total list of classes to be processed " + toBeProcessed.size());
 
         for (Map.Entry<TypeElement, List<VariableElement>> entry : toBeProcessed.entrySet()) {
             generateClass(entry.getKey(), entry.getValue());
@@ -177,8 +173,6 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 && (typeOfCurrentElement.unbox().equals(TypeName.BYTE) || typeOfCurrentElement.unbox().equals(TypeName.CHAR))) {
 
             throwError("TinyOrm: Type " + typeOfCurrentElement + " is not supported");
-        } else {
-            log("TinyOrm: Type " + typeOfCurrentElement + " is supported");
         }
     }
 

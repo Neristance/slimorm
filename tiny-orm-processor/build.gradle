@@ -1,4 +1,8 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
 apply plugin: 'java-library'
+apply plugin: 'maven-publish'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -9,3 +13,37 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_API_KEY
+
+    pkg {
+        repo = REPO
+        name = 'tinyorm-processor'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/Neristance/tinyorm.git'
+        version {
+            name = VERSION
+            desc = 'TinyOrm Annotation Processor'
+            released = new Date()
+            vcsTag = 'version_' + VERSION
+            githubRepo = GITHUB_REPO
+            githubReleaseNotesFile = 'README.md'
+        }
+    }
+
+    publications = ['TinyOrmProcessorPublication']
+}
+
+publishing {
+    publications {
+        TinyOrmProcessorPublication(MavenPublication) {
+            from components.java
+            groupId GROUP_ID
+            artifactId 'tinyorm-processor'
+            version VERSION
+        }
+    }
+}
