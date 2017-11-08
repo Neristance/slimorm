@@ -128,9 +128,9 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 .returns(listOfPojo)
                 .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
                 .addStatement("$T list = new $T<>()", listOfPojo, ARRAY_LIST_TYPE)
-                .addStatement("while (cursor.moveToNext()) {")
+                .addCode("while (cursor.moveToNext()) {\n")
                 .addStatement("     list.add(toSingleRow(cursor))")
-                .addStatement("}")
+                .addCode("}\n")
                 .addStatement("return list")
                 .build();
     }
@@ -189,7 +189,7 @@ public class TinyOrmProcessor extends AbstractProcessor {
         if (typeOfCurrentElement.equals(BYTE_ARRAY_TYPE)) {
             methodBuilder.addStatement("row.$L = cursor.getBlob(cursor.getColumnIndex($S))", element.getSimpleName(), field.columnName());
         } else {
-            methodBuilder.addStatement("if (!cursor.isNull(cursor.getColumnIndex($S))) {", field.columnName());
+            methodBuilder.addCode("if (!cursor.isNull(cursor.getColumnIndex($S))) {\n", field.columnName());
 
             if (typeOfCurrentElement.equals(ClassName.get(String.class))) {
                 methodBuilder.addStatement("    row.$L = $T.valueOf(cursor.getString(cursor.getColumnIndex($S)))", element.getSimpleName(), typeOfCurrentElement, field.columnName());
@@ -199,7 +199,7 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 methodBuilder.addStatement("    row.$L = $T.valueOf(cursor." + mapTypeToCursorGetMethod(typeOfCurrentElement.unbox()) + "(cursor.getColumnIndex($S)))", element.getSimpleName(), typeOfCurrentElement, field.columnName());
             }
 
-            methodBuilder.addStatement("}");
+            methodBuilder.addCode("}\n");
         }
 
     }
