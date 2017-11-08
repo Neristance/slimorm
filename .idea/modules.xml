@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AnnotationProcessing.iml" filepath="$PROJECT_DIR$/AnnotationProcessing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tiny-orm-annotations/tiny-orm-annotations.iml" filepath="$PROJECT_DIR$/tiny-orm-annotations/tiny-orm-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tiny-orm-processor/tiny-orm-processor.iml" filepath="$PROJECT_DIR$/tiny-orm-processor/tiny-orm-processor.iml" />
+    </modules>
+  </component>
+</project>

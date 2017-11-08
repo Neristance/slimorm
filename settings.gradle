@@ -1,0 +1,1 @@
+include ':example', ':tiny-orm-annotations', ':tiny-orm-processor'
