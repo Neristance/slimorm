@@ -14,40 +14,40 @@ public final class PojoConverter {
      Pojo row = new Pojo();
      if (!cursor.isNull(cursor.getColumnIndex("_id"))) {
          row.id = String.valueOf(cursor.getString(cursor.getColumnIndex("_id")));
-     };
+     }
      row.anInt = cursor.getInt(cursor.getColumnIndex("timeStamp"));
      if (!cursor.isNull(cursor.getColumnIndex("value"))) {
          row.niceValue = Integer.valueOf(cursor.getInt(cursor.getColumnIndex("value")));
-     };
+     }
      row.aBoolean = cursor.getInt(cursor.getColumnIndex("boolValue")) == 1;
      if (!cursor.isNull(cursor.getColumnIndex("boolValue"))) {
          row.niceBoolean = Boolean.valueOf(cursor.getInt(cursor.getColumnIndex("boolValue")) == 1);
-     };
+     }
      row.aDouble = cursor.getDouble(cursor.getColumnIndex("doubleValue"));
      if (!cursor.isNull(cursor.getColumnIndex("doubleValue"))) {
          row.niceDouble = Double.valueOf(cursor.getDouble(cursor.getColumnIndex("doubleValue")));
-     };
+     }
      row.aLong = cursor.getLong(cursor.getColumnIndex("longValue"));
      if (!cursor.isNull(cursor.getColumnIndex("longValue"))) {
          row.niceLong = Long.valueOf(cursor.getLong(cursor.getColumnIndex("longValue")));
-     };
+     }
      row.aFloat = cursor.getFloat(cursor.getColumnIndex("floatValue"));
      if (!cursor.isNull(cursor.getColumnIndex("floatValue"))) {
          row.niceFloat = Float.valueOf(cursor.getFloat(cursor.getColumnIndex("floatValue")));
-     };
+     }
      row.aShort = cursor.getShort(cursor.getColumnIndex("shortValue"));
      if (!cursor.isNull(cursor.getColumnIndex("shortValue"))) {
          row.niceShort = Short.valueOf(cursor.getShort(cursor.getColumnIndex("shortValue")));
-     };
+     }
      row.byteArray = cursor.getBlob(cursor.getColumnIndex("byteArrayValue"));
      return row;
    }
  
    public static List<Pojo> toList(Cursor cursor) {
      List<Pojo> list = new ArrayList<>();
-     while (cursor.moveToNext()) {;
+     while (cursor.moveToNext()) {
           list.add(toSingleRow(cursor));
-     };
+     }
      return list;
    }
  }
@@ -109,7 +109,7 @@ public final class PojoConverter {
      @Field(columnName = "shortValue")
      Short niceShort;
      
- 
+
      @Field(columnName = "byteArrayValue")
      byte[] byteArray;
  
@@ -122,7 +122,7 @@ public final class PojoConverter {
  * Add the @Field annotation to the fields that should be filled and specify the column name
  * Simply call ```PojoConverter.toSingleRow(cursor)``` or ```PojoConverter.toList(cursor)```
  
- **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integr``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**
+ **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integer``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**
 
 ## Gradle Setup
 
@@ -137,4 +137,4 @@ dependencies {
 
 ```
 
-**Note** im currently working on making TinyOrm available on public repositories :)
+**Note** im currently working on making TinyOrm available on public repositories :) for now it is only available through Bintray: [https://bintray.com/neristance/TinyOrm](https://bintray.com/neristance/TinyOrm) 
