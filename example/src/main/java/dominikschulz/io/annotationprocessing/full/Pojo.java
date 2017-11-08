@@ -1,4 +1,4 @@
-package dominikschulz.io.annotationprocessing;
+package dominikschulz.io.annotationprocessing.full;
 
 import dominikschulz.io.tinyorm.Field;
 

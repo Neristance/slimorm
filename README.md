@@ -152,7 +152,7 @@ public final class PojoConverter {
 
 In order to make TinyOrm work in your project you need to add the TinyOrm dependency and the TinyOrm Annotation processor
 
-``` groovy
+```groovy
 
 dependencies {
     implementation project('dominikschulz.io:tinyorm-annotations:0.2')
