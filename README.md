@@ -1,12 +1,12 @@
-# TinyOrm
-TinyOrm is a small annotation based library that generates converters form ```Cursor``` to ```POJOs``` as well as ```POJOs``` to ```ContentValues```.
+# SlimOrm
+SlimOrm is a small annotation based library that generates converters form ```Cursor``` to ```POJOs``` as well as ```POJOs``` to ```ContentValues```.
 A lot of people still using the old fashioned SqliteDatabase which comes with the Android Framework but can't easily switch to libaries like 
 [Room](https://developer.android.com/topic/libraries/architecture/room.html), [Realm](https://realm.io/), [GreenDao](http://greenrobot.org/greendao/), [ObjectBox](http://objectbox.io/) etc.
 That is where this tiny library should help to at least reduce the boilerplate code you have to write when using ```Cursor``` and make your code more readable.
 
 ## What it does
 
-TinyOrm does one simple thing: It reduces the boilerplate code you need to write when using cursors in Android by using annotations.
+SlimOrm does one simple thing: It reduces the boilerplate code you need to write when using cursors in Android by using annotations.
 It generates for you a converter class which looks like this:
 
 ```java
@@ -150,7 +150,7 @@ public final class PojoConverter {
 
 ## Gradle Setup
 
-In order to make TinyOrm work in your project you need to add the TinyOrm dependency and the TinyOrm Annotation processor
+In order to make SlimOrm work in your project you need to add the SlimOrm dependency and the SlimOrm Annotation processor
 
 ```groovy
 
@@ -158,8 +158,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation('io.dominikschulz:tinyorm-annotations:0.5')
-    annotationProcessor('io.dominikschulz:tinyorm-processor:0.5')
+    implementation('io.dominikschulz:slimorm-annotations:1.0')
+    annotationProcessor('io.dominikschulz:slimorm-processor:1.0')
 }
 
 ```

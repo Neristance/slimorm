@@ -17,12 +17,14 @@ bintray {
 
     pkg {
         repo = REPO
-        name = 'tinyorm-annotations'
+        name = 'slimorm-annotations'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/Neristance/tinyorm.git'
+        vcsUrl = 'https://github.com/Neristance/slimorm.git'
+        websiteUrl = 'https://github.com/Neristance/slimorm.git'
+        issueTrackerUrl = 'https://github.com/Neristance/slimorm.git'
         version {
             name = VERSION
-            desc = 'TinyOrm Annotations'
+            desc = 'SlimOrm Annotations'
             released = new Date()
             vcsTag = 'version_' + VERSION
             githubRepo = GITHUB_REPO
@@ -30,16 +32,16 @@ bintray {
         }
     }
 
-    publications = ['TinyOrmAnnotationsPublication']
+    publications = ['SlimOrmAnnotationsPublication']
 }
 
 publishing {
     publications {
-        TinyOrmAnnotationsPublication(MavenPublication) {
+        SlimOrmAnnotationsPublication(MavenPublication) {
             from components.java
             artifact sourcesJar
             groupId GROUP_ID
-            artifactId 'tinyorm-annotations'
+            artifactId 'slimorm-annotations'
             version VERSION
         }
     }

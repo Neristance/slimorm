@@ -1,7 +1,7 @@
 package io.dominikschulz.annotationprocessing;
 
 
-import io.dominikschulz.tinyorm.Field;
+import io.dominikschulz.slimorm.Field;
 
 public class Person {
 

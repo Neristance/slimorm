@@ -1,4 +1,4 @@
-package io.dominikschulz.tinyorm;
+package io.dominikschulz.slimorm;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

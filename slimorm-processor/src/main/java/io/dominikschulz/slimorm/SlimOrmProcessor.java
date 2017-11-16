@@ -1,4 +1,4 @@
-package io.dominikschulz.tinyorm;
+package io.dominikschulz.slimorm;
 
 
 import com.squareup.javapoet.ArrayTypeName;
@@ -31,13 +31,11 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
-import io.dominikschulz.tinyorm.Field;
-
 @SupportedAnnotationTypes({
-        "io.dominikschulz.tinyorm.Field"
+        "io.dominikschulz.slimorm.Field"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-public class TinyOrmProcessor extends AbstractProcessor {
+public class SlimOrmProcessor extends AbstractProcessor {
 
     private static final ClassName LIST_TYPE = ClassName.get("java.util", "List");
     private static final ClassName ARRAY_LIST_TYPE = ClassName.get("java.util", "ArrayList");
@@ -62,7 +60,7 @@ public class TinyOrmProcessor extends AbstractProcessor {
             if (element.getKind() == ElementKind.FIELD) {
 
                 if (element.getModifiers().contains(Modifier.PRIVATE)) {
-                    throwError("TinyOrm can only work with package protected fields");
+                    throwError("SlimOrm can only work with package protected fields");
                 }
 
                 final Element enclosingElement = element.getEnclosingElement();
@@ -191,11 +189,11 @@ public class TinyOrmProcessor extends AbstractProcessor {
                 !typeOfCurrentElement.isPrimitive() &&
                 !typeOfCurrentElement.isBoxedPrimitive()) {
 
-            throwError("TinyOrm: Type " + typeOfCurrentElement + " is not supported");
+            throwError("SlimOrm: Type " + typeOfCurrentElement + " is not supported");
         } else if ((typeOfCurrentElement.isPrimitive() || typeOfCurrentElement.isBoxedPrimitive())
                 && (typeOfCurrentElement.unbox().equals(TypeName.BYTE) || typeOfCurrentElement.unbox().equals(TypeName.CHAR))) {
 
-            throwError("TinyOrm: Type " + typeOfCurrentElement + " is not supported");
+            throwError("SlimOrm: Type " + typeOfCurrentElement + " is not supported");
         }
     }
 

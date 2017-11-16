@@ -24,11 +24,11 @@ allprojects {
     ext {
         VERSION = '0.5'
         GROUP_ID = 'io.dominikschulz'
-        REPO = 'TinyOrm'
+        REPO = 'SlimOrm'
 
         BINTRAY_USER = System.properties.getProperty("bintray.user")
         BINTRAY_API_KEY = System.properties.getProperty("bintray.key")
-        GITHUB_REPO = 'Neristance/tinyorm'
+        GITHUB_REPO = 'Neristance/slimorm'
     }
 }
 

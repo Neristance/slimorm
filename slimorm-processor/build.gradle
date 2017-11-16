@@ -5,8 +5,7 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':tiny-orm-annotations')
+    implementation project(':slimorm-annotations')
     implementation 'com.google.guava:guava:23.2-jre'
     implementation 'com.squareup:javapoet:1.9.0'
 }
@@ -21,12 +20,14 @@ bintray {
 
     pkg {
         repo = REPO
-        name = 'tinyorm-processor'
+        name = 'slimorm-processor'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/Neristance/tinyorm.git'
+        vcsUrl = 'https://github.com/Neristance/slimorm.git'
+        websiteUrl = 'https://github.com/Neristance/slimorm.git'
+        issueTrackerUrl = 'https://github.com/Neristance/slimorm.git'
         version {
             name = VERSION
-            desc = 'TinyOrm Annotation Processor'
+            desc = 'SlimOrm Annotation Processor'
             released = new Date()
             vcsTag = 'version_' + VERSION
             githubRepo = GITHUB_REPO
@@ -34,16 +35,16 @@ bintray {
         }
     }
 
-    publications = ['TinyOrmProcessorPublication']
+    publications = ['SlimOrmProcessorPublication']
 }
 
 publishing {
     publications {
-        TinyOrmProcessorPublication(MavenPublication) {
+        SlimOrmProcessorPublication(MavenPublication) {
             from components.java
             artifact sourcesJar
             groupId GROUP_ID
-            artifactId 'tinyorm-processor'
+            artifactId 'slimorm-processor'
             version VERSION
         }
     }
