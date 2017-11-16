@@ -154,11 +154,12 @@ In order to make TinyOrm work in your project you need to add the TinyOrm depend
 
 ```groovy
 
+repositories {
+    jcenter()
+}
 dependencies {
-    implementation project('dominikschulz.io:tinyorm-annotations:0.2')
-    annotationProcessor project('dominikschulz.io:tinyorm-processor:0.2')
+    implementation project('io.dominikschulz:tinyorm-annotations:0.5')
+    annotationProcessor project('io.dominikschulz:tinyorm-processor:0.5')
 }
 
 ```
-
-**Note** im currently working on making TinyOrm available on public repositories :) for now it is only available through Bintray: [https://bintray.com/neristance/TinyOrm](https://bintray.com/neristance/TinyOrm) 
