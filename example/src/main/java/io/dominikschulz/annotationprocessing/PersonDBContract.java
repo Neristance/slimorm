@@ -1,4 +1,4 @@
-package dominikschulz.io.annotationprocessing;
+package io.dominikschulz.annotationprocessing;
 
 public class PersonDBContract {
 

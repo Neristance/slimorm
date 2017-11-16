@@ -1,4 +1,4 @@
-package dominikschulz.io.processor.tinyorm;
+package io.dominikschulz.tinyorm;
 
 
 import com.squareup.javapoet.ArrayTypeName;
@@ -31,10 +31,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
-import dominikschulz.io.tinyorm.Field;
+import io.dominikschulz.tinyorm.Field;
 
 @SupportedAnnotationTypes({
-        "dominikschulz.io.tinyorm.Field"
+        "io.dominikschulz.tinyorm.Field"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class TinyOrmProcessor extends AbstractProcessor {

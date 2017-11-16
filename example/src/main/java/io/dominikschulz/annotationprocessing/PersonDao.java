@@ -1,4 +1,4 @@
-package dominikschulz.io.annotationprocessing;
+package io.dominikschulz.annotationprocessing;
 
 import android.content.ContentValues;
 import android.database.Cursor;

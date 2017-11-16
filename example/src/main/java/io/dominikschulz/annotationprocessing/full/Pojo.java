@@ -1,6 +1,6 @@
-package dominikschulz.io.annotationprocessing.full;
+package io.dominikschulz.annotationprocessing.full;
 
-import dominikschulz.io.tinyorm.Field;
+import io.dominikschulz.tinyorm.Field;
 
 public class Pojo {
 
