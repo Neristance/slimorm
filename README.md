@@ -158,8 +158,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation project('io.dominikschulz:tinyorm-annotations:0.5')
-    annotationProcessor project('io.dominikschulz:tinyorm-processor:0.5')
+    implementation('io.dominikschulz:tinyorm-annotations:0.5')
+    annotationProcessor('io.dominikschulz:tinyorm-processor:0.5')
 }
 
 ```
