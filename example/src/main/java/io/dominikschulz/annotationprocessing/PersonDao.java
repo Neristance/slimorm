@@ -17,7 +17,7 @@ public class PersonDao {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        final ContentValues contentValues = PersonConverter.toContentValues(person);
+        final ContentValues contentValues = PersonConverter.parseToContentValues(person);
         db.insert(PersonDBContract.TABLE, null, contentValues);
 
         db.close();
@@ -32,7 +32,7 @@ public class PersonDao {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor != null) {
-            studentList.addAll(PersonConverter.toList(cursor));
+            studentList.addAll(PersonConverter.parseToList(cursor));
         }
 
         cursor.close();

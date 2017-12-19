@@ -95,13 +95,16 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
         TypeSpec.Builder classBuilder = TypeSpec.
                 classBuilder(typeElement.getSimpleName() + "Converter")
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                .addModifiers(Modifier.PUBLIC);
 
-        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables));
+        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables, "toSingleRow", Modifier.PUBLIC));
+        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables, "parseToSingleRow", Modifier.PUBLIC, Modifier.STATIC));
 
-        classBuilder.addMethod(generateListParseMethod(pojoType));
+        classBuilder.addMethod(generateListParseMethod(pojoType, "toList", "toSingleRow", Modifier.PUBLIC));
+        classBuilder.addMethod(generateListParseMethod(pojoType, "parseToList", "parseToSingleRow", Modifier.PUBLIC, Modifier.STATIC));
 
-        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables));
+        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables, "toContentValues", Modifier.PUBLIC));
+        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables, "parseToContentValues", Modifier.PUBLIC, Modifier.STATIC));
 
         try {
             JavaFile.builder(pojoType.packageName(), classBuilder.build())
@@ -113,12 +116,12 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
     }
 
-    private MethodSpec generateToContentValuesMethod(TypeElement typeElement, List<VariableElement> listOfVariables) {
+    private MethodSpec generateToContentValuesMethod(TypeElement typeElement, List<VariableElement> listOfVariables, String methodName, Modifier... modifier) {
         final String parameterName = typeElement.getSimpleName().toString().toLowerCase();
         final ClassName contentValuesClassName = ClassName.get("android.content", "ContentValues");
 
-        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("toContentValues")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(modifier)
                 .returns(contentValuesClassName)
                 .addParameter(ClassName.get(typeElement), parameterName)
                 .addStatement("$T contentValues = new $T()", contentValuesClassName, contentValuesClassName);
@@ -136,17 +139,17 @@ public class SlimOrmProcessor extends AbstractProcessor {
         return methodBuilder.build();
     }
 
-    private MethodSpec generateListParseMethod(ClassName pojoType) {
+    private MethodSpec generateListParseMethod(ClassName pojoType, String methodName, String singleParseMethodName, Modifier... modifier) {
         // Add list parser
         TypeName listOfPojo = ParameterizedTypeName.get(LIST_TYPE, pojoType);
 
-        return MethodSpec.methodBuilder("toList")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        return MethodSpec.methodBuilder(methodName)
+                .addModifiers(modifier)
                 .returns(listOfPojo)
                 .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
                 .addStatement("$T list = new $T<>()", listOfPojo, ARRAY_LIST_TYPE)
                 .addCode("while (cursor.moveToNext()) {\n")
-                .addStatement("     list.add(toSingleRow(cursor))")
+                .addStatement("     list.add($L(cursor))", singleParseMethodName)
                 .addCode("}\n")
                 .addStatement("return list")
                 .addJavadoc("Converts the {@code cursor} to {@code $T}, \nmake sure the cursor is in the correct initial position", listOfPojo)
@@ -155,9 +158,9 @@ public class SlimOrmProcessor extends AbstractProcessor {
                 .build();
     }
 
-    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, List<VariableElement> listOfVariables) {
-        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("toSingleRow")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, List<VariableElement> listOfVariables, String methodName, Modifier... modifier) {
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(modifier)
                 .returns(ClassName.get(typeElement))
                 .addParameter(ClassName.get("android.database", "Cursor"), "cursor");
 
