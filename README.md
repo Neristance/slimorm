@@ -12,83 +12,55 @@ It generates for you a converter class which looks like this:
 ```java
 public class PojoConverter {
   /**
-   * Converts the {@code cursor} in its current position to an Pojo,
+   * Converts the {@code cursor} in its current position to an Pojo, 
    * make sure the cursor is in the correct position
    * @param cursor to convert values from
    * @returns Pojo with values converted from {@code cursor} */
   public Pojo toSingleRow(Cursor cursor) {
     Pojo row = new Pojo();
-    if (!cursor.isNull(cursor.getColumnIndex("_id"))) {
-        row.id = String.valueOf(cursor.getString(cursor.getColumnIndex("_id")));
-    }
-    row.anInt = cursor.getInt(cursor.getColumnIndex("timeStamp"));
-    if (!cursor.isNull(cursor.getColumnIndex("value"))) {
-        row.niceValue = Integer.valueOf(cursor.getInt(cursor.getColumnIndex("value")));
-    }
-    row.aBoolean = cursor.getInt(cursor.getColumnIndex("boolValue")) == 1;
-    if (!cursor.isNull(cursor.getColumnIndex("boolValue"))) {
-        row.niceBoolean = Boolean.valueOf(cursor.getInt(cursor.getColumnIndex("boolValue")) == 1);
-    }
-    row.aDouble = cursor.getDouble(cursor.getColumnIndex("doubleValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("doubleValue"))) {
-        row.niceDouble = Double.valueOf(cursor.getDouble(cursor.getColumnIndex("doubleValue")));
-    }
-    row.aLong = cursor.getLong(cursor.getColumnIndex("longValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("longValue"))) {
-        row.niceLong = Long.valueOf(cursor.getLong(cursor.getColumnIndex("longValue")));
-    }
-    row.aFloat = cursor.getFloat(cursor.getColumnIndex("floatValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("floatValue"))) {
-        row.niceFloat = Float.valueOf(cursor.getFloat(cursor.getColumnIndex("floatValue")));
-    }
-    row.aShort = cursor.getShort(cursor.getColumnIndex("shortValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("shortValue"))) {
-        row.niceShort = Short.valueOf(cursor.getShort(cursor.getColumnIndex("shortValue")));
-    }
-    row.byteArray = cursor.getBlob(cursor.getColumnIndex("byteArrayValue"));
+    row.id = CursorUtils.readString(cursor, "_id");
+    row.anInt = CursorUtils.readInt(cursor, "timeStamp");
+    row.niceValue = CursorUtils.readBoxedInt(cursor, "value");
+    row.aBoolean = CursorUtils.readBoolean(cursor, "boolValue");
+    row.niceBoolean = CursorUtils.readBoxedBoolean(cursor, "boolValue");
+    row.aDouble = CursorUtils.readDouble(cursor, "doubleValue");
+    row.niceDouble = CursorUtils.readBoxedDouble(cursor, "doubleValue");
+    row.aLong = CursorUtils.readLong(cursor, "longValue");
+    row.niceLong = CursorUtils.readBoxedLong(cursor, "longValue");
+    row.aFloat = CursorUtils.readFloat(cursor, "floatValue");
+    row.niceFloat = CursorUtils.readBoxedFloat(cursor, "floatValue");
+    row.aShort = CursorUtils.readShort(cursor, "shortValue");
+    row.niceShort = CursorUtils.readBoxedShort(cursor, "shortValue");
+    row.byteArray = CursorUtils.readBlob(cursor, "byteArrayValue");
     return row;
   }
 
   /**
-   * Converts the {@code cursor} in its current position to an Pojo,
+   * Converts the {@code cursor} in its current position to an Pojo, 
    * make sure the cursor is in the correct position
    * @param cursor to convert values from
    * @returns Pojo with values converted from {@code cursor} */
   public static Pojo parseToSingleRow(Cursor cursor) {
     Pojo row = new Pojo();
-    if (!cursor.isNull(cursor.getColumnIndex("_id"))) {
-        row.id = String.valueOf(cursor.getString(cursor.getColumnIndex("_id")));
-    }
-    row.anInt = cursor.getInt(cursor.getColumnIndex("timeStamp"));
-    if (!cursor.isNull(cursor.getColumnIndex("value"))) {
-        row.niceValue = Integer.valueOf(cursor.getInt(cursor.getColumnIndex("value")));
-    }
-    row.aBoolean = cursor.getInt(cursor.getColumnIndex("boolValue")) == 1;
-    if (!cursor.isNull(cursor.getColumnIndex("boolValue"))) {
-        row.niceBoolean = Boolean.valueOf(cursor.getInt(cursor.getColumnIndex("boolValue")) == 1);
-    }
-    row.aDouble = cursor.getDouble(cursor.getColumnIndex("doubleValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("doubleValue"))) {
-        row.niceDouble = Double.valueOf(cursor.getDouble(cursor.getColumnIndex("doubleValue")));
-    }
-    row.aLong = cursor.getLong(cursor.getColumnIndex("longValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("longValue"))) {
-        row.niceLong = Long.valueOf(cursor.getLong(cursor.getColumnIndex("longValue")));
-    }
-    row.aFloat = cursor.getFloat(cursor.getColumnIndex("floatValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("floatValue"))) {
-        row.niceFloat = Float.valueOf(cursor.getFloat(cursor.getColumnIndex("floatValue")));
-    }
-    row.aShort = cursor.getShort(cursor.getColumnIndex("shortValue"));
-    if (!cursor.isNull(cursor.getColumnIndex("shortValue"))) {
-        row.niceShort = Short.valueOf(cursor.getShort(cursor.getColumnIndex("shortValue")));
-    }
-    row.byteArray = cursor.getBlob(cursor.getColumnIndex("byteArrayValue"));
+    row.id = CursorUtils.readString(cursor, "_id");
+    row.anInt = CursorUtils.readInt(cursor, "timeStamp");
+    row.niceValue = CursorUtils.readBoxedInt(cursor, "value");
+    row.aBoolean = CursorUtils.readBoolean(cursor, "boolValue");
+    row.niceBoolean = CursorUtils.readBoxedBoolean(cursor, "boolValue");
+    row.aDouble = CursorUtils.readDouble(cursor, "doubleValue");
+    row.niceDouble = CursorUtils.readBoxedDouble(cursor, "doubleValue");
+    row.aLong = CursorUtils.readLong(cursor, "longValue");
+    row.niceLong = CursorUtils.readBoxedLong(cursor, "longValue");
+    row.aFloat = CursorUtils.readFloat(cursor, "floatValue");
+    row.niceFloat = CursorUtils.readBoxedFloat(cursor, "floatValue");
+    row.aShort = CursorUtils.readShort(cursor, "shortValue");
+    row.niceShort = CursorUtils.readBoxedShort(cursor, "shortValue");
+    row.byteArray = CursorUtils.readBlob(cursor, "byteArrayValue");
     return row;
   }
 
   /**
-   * Converts the {@code cursor} to {@code List<Pojo>},
+   * Converts the {@code cursor} to {@code List<Pojo>}, 
    * make sure the cursor is in the correct initial position
    * @param cursor to convert values from
    * @returns {@code List<Pojo>} with values converted from {@code cursor} */
@@ -101,7 +73,7 @@ public class PojoConverter {
   }
 
   /**
-   * Converts the {@code cursor} to {@code List<Pojo>},
+   * Converts the {@code cursor} to {@code List<Pojo>}, 
    * make sure the cursor is in the correct initial position
    * @param cursor to convert values from
    * @returns {@code List<Pojo>} with values converted from {@code cursor} */
@@ -158,7 +130,7 @@ public class PojoConverter {
     contentValues.put("byteArrayValue", pojo.byteArray);
     return contentValues;
   }
-}
+ }
  ```
 
  As you can see it generates the Boilerplate code to convert the ```Cursor``` to the fields in the ```POJO``` as well as back to ```ContentValues``` and that's pretty easy just add the ```@Field(columnName = "dbcolumn")``` annotation and you are done:
@@ -224,6 +196,9 @@ public class PojoConverter {
  }
  ```
 
+On top you get the integrated ``CursorUtils``` which do read the values from the cursor and handle non existing columns by return a default value for example **0** or **null** for boxed types.
+Those are added to reduce duplicated code on multi usage and support partial selections, however this has the downside that you need to be aware of default values for columns that are not in the selection or not in the cursor.
+
  ## Usage
 
  * Create your POJO, the fields need to be protected or package private
@@ -233,7 +208,8 @@ public class PojoConverter {
  * It also supports the way from Pojo to ```ContentValues``` simple call ```PojoConverter.parseToContentValues(pojo)```
  * It is also ready for easy testing, so not final and provides both static as well as instance methods
 
- **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integer``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**
+ **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integer``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**.
+ In case there is a column missing in the ```Cursor``` the POJO will have a default value of **0** or **null**.
 
 ## Gradle Setup
 
@@ -245,8 +221,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation('io.dominikschulz:slimorm-annotations:1.1')
-    annotationProcessor('io.dominikschulz:slimorm-processor:1.1')
+    implementation('io.dominikschulz:slimorm-annotations:1.2')
+    annotationProcessor('io.dominikschulz:slimorm-processor:1.2')
 }
 
 ```

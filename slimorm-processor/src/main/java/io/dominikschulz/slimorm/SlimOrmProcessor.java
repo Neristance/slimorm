@@ -38,8 +38,11 @@ import javax.tools.Diagnostic;
 public class SlimOrmProcessor extends AbstractProcessor {
 
     private static final ClassName LIST_TYPE = ClassName.get("java.util", "List");
+    private static final ClassName CURSORUTILS_TYPE = ClassName.get("io.dominikschulz.slimorm", "CursorUtils");
     private static final ClassName ARRAY_LIST_TYPE = ClassName.get("java.util", "ArrayList");
     private static final ArrayTypeName BYTE_ARRAY_TYPE = ArrayTypeName.of(TypeName.BYTE);
+    private static final ClassName STRING_TYPE = ClassName.get(String.class);
+
     private Messager messager;
     private Filer filer;
 
@@ -52,6 +55,8 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+
+        generateCursorUtils();
 
         Map<TypeElement, List<VariableElement>> toBeProcessed = new HashMap<>();
 
@@ -83,6 +88,140 @@ public class SlimOrmProcessor extends AbstractProcessor {
         }
 
         return false;
+    }
+
+    private void generateCursorUtils() {
+        final TypeSpec.Builder classBuilder = TypeSpec.classBuilder("CursorUtils").addModifiers(Modifier.PUBLIC);
+
+        // Primitive Types supported by Cursor
+        addPrimitiveReadMethod(classBuilder, "readInt", TypeName.INT, "0");
+        addPrimitiveReadMethod(classBuilder, "readFloat", TypeName.FLOAT, "0");
+        addPrimitiveReadMethod(classBuilder, "readDouble", TypeName.DOUBLE, "0");
+        addPrimitiveReadMethod(classBuilder, "readShort", TypeName.SHORT, "0");
+        addPrimitiveReadMethod(classBuilder, "readLong", TypeName.LONG, "0");
+        addPrimitiveReadMethod(classBuilder, "readBoolean", TypeName.BOOLEAN, "false");
+
+
+        // Non Primitive Types and Boxed version supported by Cursor also includes blob and String
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedInt", TypeName.INT);
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedFloat", TypeName.FLOAT);
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedDouble", TypeName.DOUBLE);
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedShort", TypeName.SHORT);
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedLong", TypeName.LONG);
+        addNonPrimitiveReadMethod(classBuilder, "readBoxedBoolean", TypeName.BOOLEAN);
+
+        addStringReadMethod(classBuilder, "readString");
+        addBlobReadMethod(classBuilder, "readBlob");
+
+        try {
+            JavaFile.builder("io.dominikschulz.slimorm", classBuilder.build())
+                    .build()
+                    .writeTo(filer);
+        } catch (IOException e) {
+        }
+    }
+
+    private void addBlobReadMethod(TypeSpec.Builder classBuilder, String methodName) {
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(BYTE_ARRAY_TYPE)
+                .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
+                .addParameter(STRING_TYPE, "columnName");
+
+        methodBuilder.addStatement("$T columnIndex = cursor.getColumnIndex(columnName)", TypeName.INT);
+        methodBuilder.addCode("if (columnIndex >= 0) {\n");
+
+        methodBuilder.addCode("\tif (!cursor.isNull(columnIndex)) {\n");
+
+        methodBuilder.addStatement("\t\treturn cursor.getBlob(columnIndex)");
+
+        methodBuilder.addCode("\t} else {\n");
+        methodBuilder.addStatement("\t\treturn $L", "null");
+        methodBuilder.addCode("\t}\n");
+
+        methodBuilder.addCode("} else {\n");
+        methodBuilder.addStatement("\treturn $L", "null");
+        methodBuilder.addCode("}\n");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addStringReadMethod(TypeSpec.Builder classBuilder, String methodName) {
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(STRING_TYPE)
+                .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
+                .addParameter(STRING_TYPE, "columnName");
+
+        methodBuilder.addStatement("$T columnIndex = cursor.getColumnIndex(columnName)", TypeName.INT);
+        methodBuilder.addCode("if (columnIndex >= 0) {\n");
+
+        methodBuilder.addCode("\tif (!cursor.isNull(columnIndex)) {\n");
+
+        methodBuilder.addStatement("\t\treturn cursor.getString(columnIndex)");
+
+        methodBuilder.addCode("\t} else {\n");
+        methodBuilder.addStatement("\t\treturn $L", "null");
+        methodBuilder.addCode("\t}\n");
+
+        methodBuilder.addCode("} else {\n");
+        methodBuilder.addStatement("\treturn $L", "null");
+        methodBuilder.addCode("}\n");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addNonPrimitiveReadMethod(TypeSpec.Builder classBuilder, String methodName, TypeName type) {
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(type.box())
+                .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
+                .addParameter(STRING_TYPE, "columnName");
+
+        methodBuilder.addStatement("$T columnIndex = cursor.getColumnIndex(columnName)", TypeName.INT);
+        methodBuilder.addCode("if (columnIndex >= 0) {\n");
+
+        methodBuilder.addCode("\tif (!cursor.isNull(columnIndex)) {\n");
+
+        if (type == TypeName.BOOLEAN) {
+            methodBuilder.addStatement("\t\treturn cursor." + mapTypeToCursorGetMethod(type) + "(columnIndex) == 1");
+        } else {
+            methodBuilder.addStatement("\t\treturn cursor." + mapTypeToCursorGetMethod(type) + "(columnIndex)");
+        }
+
+        methodBuilder.addCode("\t} else {\n");
+        methodBuilder.addStatement("\t\treturn $L", "null");
+        methodBuilder.addCode("\t}\n");
+
+        methodBuilder.addCode("} else {\n");
+        methodBuilder.addStatement("\treturn $L", "null");
+        methodBuilder.addCode("}\n");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addPrimitiveReadMethod(TypeSpec.Builder classBuilder, String methodName, TypeName primitiveType, String defaultValue) {
+        final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(primitiveType)
+                .addParameter(ClassName.get("android.database", "Cursor"), "cursor")
+                .addParameter(STRING_TYPE, "columnName");
+
+        methodBuilder.addStatement("$T columnIndex = cursor.getColumnIndex(columnName)", TypeName.INT);
+        methodBuilder.addCode("if (columnIndex >= 0) {\n");
+
+        if (primitiveType == TypeName.BOOLEAN) {
+            methodBuilder.addStatement("\treturn cursor." + mapTypeToCursorGetMethod(primitiveType) + "(columnIndex) == 1");
+        } else {
+            methodBuilder.addStatement("\treturn cursor." + mapTypeToCursorGetMethod(primitiveType) + "(columnIndex)");
+        }
+
+        methodBuilder.addCode("} else {\n");
+        methodBuilder.addStatement("\treturn $L", defaultValue);
+        methodBuilder.addCode("}\n");
+
+
+        classBuilder.addMethod(methodBuilder.build());
     }
 
     private void log(String message) {
@@ -187,7 +326,7 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
     private void checkIfTypeIsSupported(VariableElement variableElement) {
         final TypeName typeOfCurrentElement = ClassName.get(variableElement.asType());
-        if (!typeOfCurrentElement.equals(ClassName.get(String.class)) &&
+        if (!typeOfCurrentElement.equals(STRING_TYPE) &&
                 !typeOfCurrentElement.equals(BYTE_ARRAY_TYPE) &&
                 !typeOfCurrentElement.isPrimitive() &&
                 !typeOfCurrentElement.isBoxedPrimitive()) {
@@ -211,33 +350,56 @@ public class SlimOrmProcessor extends AbstractProcessor {
         final TypeName typeOfCurrentElement = ClassName.get(element.asType());
 
         if (typeOfCurrentElement.equals(BYTE_ARRAY_TYPE)) {
-            methodBuilder.addStatement("row.$L = cursor.getBlob(cursor.getColumnIndex($S))", element.getSimpleName(), field.columnName());
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        } else if (typeOfCurrentElement.equals(STRING_TYPE)) {
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
         } else {
-            methodBuilder.addCode("if (!cursor.isNull(cursor.getColumnIndex($S))) {\n", field.columnName());
-
-            if (typeOfCurrentElement.equals(ClassName.get(String.class))) {
-                methodBuilder.addStatement("    row.$L = $T.valueOf(cursor.getString(cursor.getColumnIndex($S)))", element.getSimpleName(), typeOfCurrentElement, field.columnName());
-            } else if (typeOfCurrentElement.unbox().equals(TypeName.BOOLEAN)) {
-                methodBuilder.addStatement("    row.$L = $T.valueOf(cursor." + mapTypeToCursorGetMethod(typeOfCurrentElement.unbox()) + "(cursor.getColumnIndex($S)) == 1)", element.getSimpleName(), typeOfCurrentElement, field.columnName());
-            } else {
-                methodBuilder.addStatement("    row.$L = $T.valueOf(cursor." + mapTypeToCursorGetMethod(typeOfCurrentElement.unbox()) + "(cursor.getColumnIndex($S)))", element.getSimpleName(), typeOfCurrentElement, field.columnName());
-            }
-
-            methodBuilder.addCode("}\n");
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
         }
-
     }
 
     private void addPrimitiveType(VariableElement element, MethodSpec.Builder methodBuilder) {
-
         Field field = element.getAnnotation(Field.class);
         final TypeName typeName = ClassName.get(element.asType());
+        methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+    }
 
+    private String mapTypeToCursorUtilReadMethod(TypeName typeName) {
         if (typeName == TypeName.BOOLEAN) {
-            methodBuilder.addStatement("row.$L = cursor." + mapTypeToCursorGetMethod(typeName) + "(cursor.getColumnIndex($S)) == 1", element.getSimpleName(), field.columnName());
-        } else {
-            methodBuilder.addStatement("row.$L = cursor." + mapTypeToCursorGetMethod(typeName) + "(cursor.getColumnIndex($S))", element.getSimpleName(), field.columnName());
+            return "readBoolean";
+        } else if (typeName == TypeName.SHORT) {
+            return "readShort";
+        } else if (typeName == TypeName.INT) {
+            return "readInt";
+        } else if (typeName == TypeName.LONG) {
+            return "readLong";
+        } else if (typeName == TypeName.FLOAT) {
+            return "readFloat";
+        } else if (typeName == TypeName.DOUBLE) {
+            return "readDouble";
         }
+        return "";
+    }
+
+    private String mapTypeToCursorUtilNonPrimitiveReadMethod(TypeName typeName) {
+        if (typeName == TypeName.BOOLEAN) {
+            return "readBoxedBoolean";
+        } else if (typeName == TypeName.SHORT) {
+            return "readBoxedShort";
+        } else if (typeName == TypeName.INT) {
+            return "readBoxedInt";
+        } else if (typeName == TypeName.LONG) {
+            return "readBoxedLong";
+        } else if (typeName == TypeName.FLOAT) {
+            return "readBoxedFloat";
+        } else if (typeName == TypeName.DOUBLE) {
+            return "readBoxedDouble";
+        } else if (typeName.equals(BYTE_ARRAY_TYPE)) {
+            return "readBlob";
+        } else if (typeName.equals(STRING_TYPE)) {
+            return "readString";
+        }
+        return "";
     }
 
     private String mapTypeToCursorGetMethod(TypeName typeName) {
