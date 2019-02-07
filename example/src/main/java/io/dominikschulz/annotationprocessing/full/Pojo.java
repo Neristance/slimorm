@@ -4,46 +4,46 @@ import io.dominikschulz.slimorm.Field;
 
 public class Pojo {
 
-    @Field(columnName = "_id")
+    @Field("_id")
     String id;
 
-    @Field(columnName = "timeStamp")
+    @Field("timeStamp")
     int anInt;
 
-    @Field(columnName = "value")
+    @Field("value")
     Integer niceValue;
 
-    @Field(columnName = "boolValue")
+    @Field("boolValue")
     boolean anBoolean;
 
-    @Field(columnName = "boolValue")
+    @Field("boolValue")
     Boolean niceBoolean;
 
-    @Field(columnName = "doubleValue")
+    @Field("doubleValue")
     double aDouble;
 
-    @Field(columnName = "doubleValue")
+    @Field("doubleValue")
     Double niceDouble;
 
-    @Field(columnName = "longValue")
+    @Field("longValue")
     long aLong;
 
-    @Field(columnName = "longValue")
+    @Field("longValue")
     Long niceLong;
 
-    @Field(columnName = "floatValue")
+    @Field("floatValue")
     float aFloat;
 
-    @Field(columnName = "floatValue")
+    @Field("floatValue")
     Float niceFloat;
 
-    @Field(columnName = "shortValue")
+    @Field("shortValue")
     short aShort;
 
-    @Field(columnName = "shortValue")
+    @Field("shortValue")
     Short niceShort;
 
-    @Field(columnName = "byteArrayValue")
+    @Field("byteArrayValue")
     byte[] byteArray;
 
 }

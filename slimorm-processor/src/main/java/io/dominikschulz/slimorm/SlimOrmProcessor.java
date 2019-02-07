@@ -286,12 +286,12 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
         for (VariableElement variableElement : processPojo.getAnnotatedFields()) {
             Field field = variableElement.getAnnotation(Field.class);
-            methodBuilder.addStatement("contentValues.put($S, $L)", field.columnName(), parameterName + "." + variableElement.getSimpleName());
+            methodBuilder.addStatement("contentValues.put($S, $L)", field.value(), parameterName + "." + variableElement.getSimpleName());
         }
 
         for (ExecutableElement getter : processPojo.getAnnotatedGetters()) {
             Field field = getter.getAnnotation(Field.class);
-            methodBuilder.addStatement("contentValues.put($S, $L)", field.columnName(), parameterName + "." + getter.getSimpleName()+"()");
+            methodBuilder.addStatement("contentValues.put($S, $L)", field.value(), parameterName + "." + getter.getSimpleName()+"()");
         }
 
         methodBuilder.addStatement("return contentValues");
@@ -389,11 +389,11 @@ public class SlimOrmProcessor extends AbstractProcessor {
         final TypeName typeOfCurrentElement = ClassName.get(element.asType());
 
         if (typeOfCurrentElement.equals(BYTE_ARRAY_TYPE)) {
-            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.value());
         } else if (typeOfCurrentElement.equals(STRING_TYPE)) {
-            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.value());
         } else {
-            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.value());
         }
     }
 
@@ -403,11 +403,11 @@ public class SlimOrmProcessor extends AbstractProcessor {
         final TypeName typeOfCurrentElement = ClassName.get(parameterElement.asType());
 
         if (typeOfCurrentElement.equals(BYTE_ARRAY_TYPE)) {
-            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.value());
         } else if (typeOfCurrentElement.equals(STRING_TYPE)) {
-            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.value());
         } else {
-            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.value());
         }
     }
 
@@ -418,13 +418,13 @@ public class SlimOrmProcessor extends AbstractProcessor {
     private void addPrimitiveType(VariableElement element, MethodSpec.Builder methodBuilder) {
         Field field = element.getAnnotation(Field.class);
         final TypeName typeName = ClassName.get(element.asType());
-        methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.value());
     }
 
     private void addPrimitiveSetterType(ExecutableElement setterElement, VariableElement parameterElement, MethodSpec.Builder methodBuilder) {
         Field field = setterElement.getAnnotation(Field.class);
         final TypeName typeName = ClassName.get(parameterElement.asType());
-        methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.value());
     }
 
     private String mapTypeToCursorUtilReadMethod(TypeName typeName) {
