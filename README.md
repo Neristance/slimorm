@@ -133,64 +133,64 @@ public class PojoConverter {
  }
  ```
 
- As you can see it generates the Boilerplate code to convert the ```Cursor``` to the fields in the ```POJO``` as well as back to ```ContentValues``` and that's pretty easy just add the ```@Field(columnName = "dbcolumn")``` annotation and you are done:
+ As you can see it generates the Boilerplate code to convert the ```Cursor``` to the fields in the ```POJO``` as well as back to ```ContentValues``` and that's pretty easy just add the ```@Field("dbcolumn")``` annotation and you are done:
 
  ```java
  public class Pojo {
 
-     @Field(columnName = "_id")
+     @Field("_id")
      String id;
 
 
-     @Field(columnName = "timeStamp")
+     @Field("timeStamp")
      int anInt;
 
 
-     @Field(columnName = "value")
+     @Field("value")
      Integer niceValue;
 
 
-     @Field(columnName = "boolValue")
+     @Field("boolValue")
      boolean anBoolean;
 
 
-     @Field(columnName = "boolValue")
+     @Field("boolValue")
      Boolean niceBoolean;
 
 
-     @Field(columnName = "doubleValue")
+     @Field("doubleValue")
      double aDouble;
 
 
-     @Field(columnName = "doubleValue")
+     @Field("doubleValue")
      Double niceDouble;
 
 
-     @Field(columnName = "longValue")
+     @Field("longValue")
      long aLong;
 
 
-     @Field(columnName = "longValue")
+     @Field("longValue")
      Long niceLong;
 
 
-     @Field(columnName = "floatValue")
+     @Field("floatValue")
      float aFloat;
 
 
-     @Field(columnName = "floatValue")
+     @Field("floatValue")
      Float niceFloat;
 
 
-     @Field(columnName = "shortValue")
+     @Field("shortValue")
      short aShort;
 
 
-     @Field(columnName = "shortValue")
+     @Field("shortValue")
      Short niceShort;
 
 
-     @Field(columnName = "byteArrayValue")
+     @Field("byteArrayValue")
      byte[] byteArray;
 
  }
@@ -221,8 +221,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation('io.dominikschulz:slimorm-annotations:1.2.1')
-    annotationProcessor('io.dominikschulz:slimorm-processor:1.2.1')
+    implementation('io.dominikschulz:slimorm-annotations:2.0')
+    annotationProcessor('io.dominikschulz:slimorm-processor:2.0')
 }
 
 ```

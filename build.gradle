@@ -23,7 +23,7 @@ allprojects {
     }
 
     ext {
-        VERSION = '1.2.2'
+        VERSION = '2.0'
         GROUP_ID = 'io.dominikschulz'
         REPO = 'SlimOrm'
 
