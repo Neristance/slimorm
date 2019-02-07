@@ -14,7 +14,7 @@ public class Pojo {
     Integer niceValue;
 
     @Field(columnName = "boolValue")
-    boolean aBoolean;
+    boolean anBoolean;
 
     @Field(columnName = "boolValue")
     Boolean niceBoolean;

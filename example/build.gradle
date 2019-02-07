@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "io.dominikschulz.annotationprocessing"
         minSdkVersion 16
@@ -28,5 +29,5 @@ dependencies {
     })
 
     implementation project(':slimorm-annotations')
-    annotationProcessor project(':slimorm-processor')
+    kapt project(':slimorm-processor')
 }

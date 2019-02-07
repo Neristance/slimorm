@@ -21,7 +21,7 @@ public class PojoConverter {
     row.id = CursorUtils.readString(cursor, "_id");
     row.anInt = CursorUtils.readInt(cursor, "timeStamp");
     row.niceValue = CursorUtils.readBoxedInt(cursor, "value");
-    row.aBoolean = CursorUtils.readBoolean(cursor, "boolValue");
+    row.anBoolean = CursorUtils.readBoolean(cursor, "boolValue");
     row.niceBoolean = CursorUtils.readBoxedBoolean(cursor, "boolValue");
     row.aDouble = CursorUtils.readDouble(cursor, "doubleValue");
     row.niceDouble = CursorUtils.readBoxedDouble(cursor, "doubleValue");
@@ -45,7 +45,7 @@ public class PojoConverter {
     row.id = CursorUtils.readString(cursor, "_id");
     row.anInt = CursorUtils.readInt(cursor, "timeStamp");
     row.niceValue = CursorUtils.readBoxedInt(cursor, "value");
-    row.aBoolean = CursorUtils.readBoolean(cursor, "boolValue");
+    row.anBoolean = CursorUtils.readBoolean(cursor, "boolValue");
     row.niceBoolean = CursorUtils.readBoxedBoolean(cursor, "boolValue");
     row.aDouble = CursorUtils.readDouble(cursor, "doubleValue");
     row.niceDouble = CursorUtils.readBoxedDouble(cursor, "doubleValue");
@@ -94,7 +94,7 @@ public class PojoConverter {
     contentValues.put("_id", pojo.id);
     contentValues.put("timeStamp", pojo.anInt);
     contentValues.put("value", pojo.niceValue);
-    contentValues.put("boolValue", pojo.aBoolean);
+    contentValues.put("boolValue", pojo.anBoolean);
     contentValues.put("boolValue", pojo.niceBoolean);
     contentValues.put("doubleValue", pojo.aDouble);
     contentValues.put("doubleValue", pojo.niceDouble);
@@ -117,7 +117,7 @@ public class PojoConverter {
     contentValues.put("_id", pojo.id);
     contentValues.put("timeStamp", pojo.anInt);
     contentValues.put("value", pojo.niceValue);
-    contentValues.put("boolValue", pojo.aBoolean);
+    contentValues.put("boolValue", pojo.anBoolean);
     contentValues.put("boolValue", pojo.niceBoolean);
     contentValues.put("doubleValue", pojo.aDouble);
     contentValues.put("doubleValue", pojo.niceDouble);
@@ -151,7 +151,7 @@ public class PojoConverter {
 
 
      @Field(columnName = "boolValue")
-     boolean aBoolean;
+     boolean anBoolean;
 
 
      @Field(columnName = "boolValue")
@@ -221,8 +221,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation('io.dominikschulz:slimorm-annotations:1.2')
-    annotationProcessor('io.dominikschulz:slimorm-processor:1.2')
+    implementation('io.dominikschulz:slimorm-annotations:1.2.1')
+    annotationProcessor('io.dominikschulz:slimorm-processor:1.2.1')
 }
 
 ```

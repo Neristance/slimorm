@@ -16,4 +16,11 @@ public class Person {
 
     @Field(columnName = PersonDBContract.COLUMN_AGE)
     Integer age;
+
+    @Field(columnName = PersonDBContract.COLUMN_AGE)
+    boolean isFake;
+
+    @Field(columnName = PersonDBContract.COLUMN_AGE)
+    boolean fakeData;
+
 }

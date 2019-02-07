@@ -26,9 +26,11 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes({
@@ -58,9 +60,21 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
         generateCursorUtils();
 
-        Map<TypeElement, List<VariableElement>> toBeProcessed = new HashMap<>();
+        Map<TypeElement, ProcessPojo> toBeProcessed = new HashMap<>();
 
         for (Element element : roundEnv.getElementsAnnotatedWith(Field.class)) {
+
+            ProcessPojo currentProcessPojo = null;
+            final Element enclosingElement = element.getEnclosingElement();
+            if (enclosingElement.getKind() == ElementKind.CLASS) {
+                final TypeElement classElement = (TypeElement) enclosingElement;
+
+                if (!toBeProcessed.containsKey(classElement)) {
+                    toBeProcessed.put(classElement, new ProcessPojo(new ArrayList<VariableElement>(), new ArrayList<ExecutableElement>(), new ArrayList<ExecutableElement>()));
+                }
+
+                currentProcessPojo = toBeProcessed.get(classElement);
+            }
 
             if (element.getKind() == ElementKind.FIELD) {
 
@@ -68,22 +82,27 @@ public class SlimOrmProcessor extends AbstractProcessor {
                     throwError("SlimOrm can only work with package protected fields");
                 }
 
-                final Element enclosingElement = element.getEnclosingElement();
-                if (enclosingElement.getKind() == ElementKind.CLASS) {
-                    final TypeElement classElement = (TypeElement) enclosingElement;
+                final List<VariableElement> variableElements = currentProcessPojo.getAnnotatedFields();
+                variableElements.add((VariableElement) element);
 
-                    if (!toBeProcessed.containsKey(classElement)) {
-                        toBeProcessed.put(classElement, new ArrayList<VariableElement>());
-                    }
+            } else if (element.getKind() == ElementKind.METHOD) {
+                final List<ExecutableElement> annotatedSetters = currentProcessPojo.getAnnotatedSetters();
+                final List<ExecutableElement> annotatedGetters = currentProcessPojo.getAnnotatedGetters();
+                final ExecutableElement executableElement = (ExecutableElement) element;
 
-                    List<VariableElement> variableElements = toBeProcessed.get(classElement);
-                    variableElements.add((VariableElement) element);
+                if (executableElement.getReturnType().getKind() == TypeKind.VOID && executableElement.getParameters().size() == 1) {
+                    //Setter
+                    annotatedSetters.add(executableElement);
+                } else if ((executableElement.getReturnType().getKind() != TypeKind.VOID && executableElement.getParameters().size() == 0)){
+                    // Getter
+                    annotatedGetters.add(executableElement);
                 }
 
             }
+
         }
 
-        for (Map.Entry<TypeElement, List<VariableElement>> entry : toBeProcessed.entrySet()) {
+        for (Map.Entry<TypeElement, ProcessPojo> entry : toBeProcessed.entrySet()) {
             generateClass(entry.getKey(), entry.getValue());
         }
 
@@ -228,7 +247,7 @@ public class SlimOrmProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.NOTE, message);
     }
 
-    private void generateClass(TypeElement typeElement, List<VariableElement> listOfVariables) {
+    private void generateClass(TypeElement typeElement, ProcessPojo processPojo) {
 
         final ClassName pojoType = ClassName.get(typeElement);
 
@@ -236,14 +255,14 @@ public class SlimOrmProcessor extends AbstractProcessor {
                 classBuilder(typeElement.getSimpleName() + "Converter")
                 .addModifiers(Modifier.PUBLIC);
 
-        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables, "toSingleRow", Modifier.PUBLIC));
-        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, listOfVariables, "parseToSingleRow", Modifier.PUBLIC, Modifier.STATIC));
+        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, processPojo, "toSingleRow", Modifier.PUBLIC));
+        classBuilder.addMethod(generateSingleRowParseMethod(typeElement, processPojo, "parseToSingleRow", Modifier.PUBLIC, Modifier.STATIC));
 
         classBuilder.addMethod(generateListParseMethod(pojoType, "toList", "toSingleRow", Modifier.PUBLIC));
         classBuilder.addMethod(generateListParseMethod(pojoType, "parseToList", "parseToSingleRow", Modifier.PUBLIC, Modifier.STATIC));
 
-        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables, "toContentValues", Modifier.PUBLIC));
-        classBuilder.addMethod(generateToContentValuesMethod(typeElement, listOfVariables, "parseToContentValues", Modifier.PUBLIC, Modifier.STATIC));
+        classBuilder.addMethod(generateToContentValuesMethod(typeElement, processPojo, "toContentValues", Modifier.PUBLIC));
+        classBuilder.addMethod(generateToContentValuesMethod(typeElement, processPojo, "parseToContentValues", Modifier.PUBLIC, Modifier.STATIC));
 
         try {
             JavaFile.builder(pojoType.packageName(), classBuilder.build())
@@ -255,7 +274,7 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
     }
 
-    private MethodSpec generateToContentValuesMethod(TypeElement typeElement, List<VariableElement> listOfVariables, String methodName, Modifier... modifier) {
+    private MethodSpec generateToContentValuesMethod(TypeElement typeElement, ProcessPojo processPojo, String methodName, Modifier... modifier) {
         final String parameterName = typeElement.getSimpleName().toString().toLowerCase();
         final ClassName contentValuesClassName = ClassName.get("android.content", "ContentValues");
 
@@ -265,9 +284,14 @@ public class SlimOrmProcessor extends AbstractProcessor {
                 .addParameter(ClassName.get(typeElement), parameterName)
                 .addStatement("$T contentValues = new $T()", contentValuesClassName, contentValuesClassName);
 
-        for (VariableElement variableElement : listOfVariables) {
+        for (VariableElement variableElement : processPojo.getAnnotatedFields()) {
             Field field = variableElement.getAnnotation(Field.class);
             methodBuilder.addStatement("contentValues.put($S, $L)", field.columnName(), parameterName + "." + variableElement.getSimpleName());
+        }
+
+        for (ExecutableElement getter : processPojo.getAnnotatedGetters()) {
+            Field field = getter.getAnnotation(Field.class);
+            methodBuilder.addStatement("contentValues.put($S, $L)", field.columnName(), parameterName + "." + getter.getSimpleName()+"()");
         }
 
         methodBuilder.addStatement("return contentValues");
@@ -297,7 +321,7 @@ public class SlimOrmProcessor extends AbstractProcessor {
                 .build();
     }
 
-    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, List<VariableElement> listOfVariables, String methodName, Modifier... modifier) {
+    private MethodSpec generateSingleRowParseMethod(TypeElement typeElement, ProcessPojo processPojo, String methodName, Modifier... modifier) {
         final MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                 .addModifiers(modifier)
                 .returns(ClassName.get(typeElement))
@@ -305,7 +329,7 @@ public class SlimOrmProcessor extends AbstractProcessor {
 
         methodBuilder.addStatement("$T row = new $T()", typeElement, typeElement);
 
-        for (VariableElement variableElement : listOfVariables) {
+        for (VariableElement variableElement : processPojo.getAnnotatedFields()) {
 
             checkIfTypeIsSupported(variableElement);
 
@@ -314,6 +338,21 @@ public class SlimOrmProcessor extends AbstractProcessor {
             } else {
                 addNonPrimitiveType(variableElement, methodBuilder);
             }
+        }
+
+        for (ExecutableElement executableElement : processPojo.getAnnotatedSetters()) {
+            final VariableElement setterParameter = executableElement.getParameters().get(0);
+            checkIfTypeIsSupported(setterParameter);
+
+            log(" " + executableElement.getSimpleName() + " setter " + setterParameter.getSimpleName());
+
+            if (ClassName.get(setterParameter.asType()).isPrimitive()) {
+                log(" add setter " + executableElement.getSimpleName());
+                addPrimitiveSetterType(executableElement, setterParameter, methodBuilder);
+            } else {
+                addNonPrimitiveSetterType(executableElement, setterParameter, methodBuilder);
+            }
+
         }
 
         methodBuilder.addStatement("return row");
@@ -358,10 +397,34 @@ public class SlimOrmProcessor extends AbstractProcessor {
         }
     }
 
+    private void addNonPrimitiveSetterType(ExecutableElement setterElement, VariableElement parameterElement, MethodSpec.Builder methodBuilder) {
+
+        Field field = setterElement.getAnnotation(Field.class);
+        final TypeName typeOfCurrentElement = ClassName.get(parameterElement.asType());
+
+        if (typeOfCurrentElement.equals(BYTE_ARRAY_TYPE)) {
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        } else if (typeOfCurrentElement.equals(STRING_TYPE)) {
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        } else {
+            methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilNonPrimitiveReadMethod(typeOfCurrentElement.unbox()) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+        }
+    }
+
+    private String capitalize(String value) {
+        return value.substring(0, 1).toUpperCase() + value.substring(1);
+    }
+
     private void addPrimitiveType(VariableElement element, MethodSpec.Builder methodBuilder) {
         Field field = element.getAnnotation(Field.class);
         final TypeName typeName = ClassName.get(element.asType());
         methodBuilder.addStatement("row.$L = $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S)", element.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
+    }
+
+    private void addPrimitiveSetterType(ExecutableElement setterElement, VariableElement parameterElement, MethodSpec.Builder methodBuilder) {
+        Field field = setterElement.getAnnotation(Field.class);
+        final TypeName typeName = ClassName.get(parameterElement.asType());
+        methodBuilder.addStatement("row.$L ( $T." + mapTypeToCursorUtilReadMethod(typeName) + "(cursor, $S))", setterElement.getSimpleName(), CURSORUTILS_TYPE, field.columnName());
     }
 
     private String mapTypeToCursorUtilReadMethod(TypeName typeName) {
