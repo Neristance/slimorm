@@ -196,9 +196,6 @@ public class PojoConverter {
  }
  ```
 
-On top you get the integrated ``CursorUtils``` which do read the values from the cursor and handle non existing columns by return a default value for example **0** or **null** for boxed types.
-Those are added to reduce duplicated code on multi usage and support partial selections, however this has the downside that you need to be aware of default values for columns that are not in the selection or not in the cursor.
-
  ## Usage
 
  * Create your POJO, the fields need to be protected or package private
@@ -211,6 +208,9 @@ Those are added to reduce duplicated code on multi usage and support partial sel
  **A tiny note**: If you use boxed versions of primitives e.g. ```java.lang.Integer``` it also supports nullable columns, that means if a column is **null** in database also the field will be **null**.
  In case there is a column missing in the ```Cursor``` the POJO will have a default value of **0** or **null**.
 
+## New
+ * Two new annotations @PojoCreator to annotate constructors to be used for creating the pojo and @ColumnName to define the name of columns while using @PojoCreator
+
 ## Gradle Setup
 
 In order to make SlimOrm work in your project you need to add the SlimOrm dependency and the SlimOrm Annotation processor
@@ -221,8 +221,8 @@ repositories {
     jcenter()
 }
 dependencies {
-    implementation('io.dominikschulz:slimorm-annotations:2.0')
-    annotationProcessor('io.dominikschulz:slimorm-processor:2.0')
+    implementation('io.dominikschulz:slimorm-annotations:2.1')
+    annotationProcessor('io.dominikschulz:slimorm-processor:2.1')
 }
 
 ```

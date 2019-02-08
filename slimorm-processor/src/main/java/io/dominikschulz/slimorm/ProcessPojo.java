@@ -10,11 +10,16 @@ public class ProcessPojo {
     private final List<VariableElement> annotatedFields;
     private final List<ExecutableElement> annotatedSetters;
     private final List<ExecutableElement> annotatedGetters;
+    private final List<ExecutableElement> annotatedConstructors;
 
-    public ProcessPojo(List<VariableElement> annotatedFields, List<ExecutableElement> annotadedMethods, List<ExecutableElement> annotatedGetters) {
+    public ProcessPojo(List<VariableElement> annotatedFields,
+                       List<ExecutableElement> annotatedMethods,
+                       List<ExecutableElement> annotatedGetters,
+                       List<ExecutableElement> annotatedConstructors) {
         this.annotatedFields = annotatedFields;
-        this.annotatedSetters = annotadedMethods;
+        this.annotatedSetters = annotatedMethods;
         this.annotatedGetters = annotatedGetters;
+        this.annotatedConstructors = annotatedConstructors;
     }
 
     public List<VariableElement> getAnnotatedFields() {
@@ -27,5 +32,9 @@ public class ProcessPojo {
 
     public List<ExecutableElement> getAnnotatedGetters() {
         return annotatedGetters;
+    }
+
+    public List<ExecutableElement> getAnnotatedConstructors() {
+        return annotatedConstructors;
     }
 }
